@@ -1,500 +1,112 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport"
- content="width=device-width, initial-scale=1.0">
-<title>無限アイスクリッカー</title>
-
-<!-- 【修正】同じフォルダ内のjsを確実に読み込む設定 -->
-<script src="./script.js"></script>
-
-<style>
-  body {
-    font-family: sans-serif;
-    text-align: center;
-    background: linear-gradient(
-      135deg, #f5f7fa, #c3cfe2
-    );
-    margin: 0; padding: 15px;
-    overflow-x: hidden;
-    min-height: 100vh;
-    color: #333;
-  }
-  h1 { font-size: 24px; color: #ff4500; }
-  
-  .status-box {
-    background: rgba(255,255,255,0.9);
-    padding: 12px; border-radius: 12px;
-    margin: 0 auto 15px auto;
-    max-width: 320px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-  }
-  .coin-highlight {
-    font-size: 30px; color: #ff69b4;
-    font-weight: bold;
-  }
-  
-  #ice-cream {
-    font-size: 110px; cursor: pointer;
-    user-select: none; margin: 5px;
-    transition: transform 0.05s;
-    display: inline-block;
-  }
-  #ice-cream:active {
-    transform: scale(0.85) rotate(-5deg);
-  }
-  
-  .click-pop {
-    position: absolute; font-weight: bold;
-    font-size: 24px; color: #ff4500;
-    text-shadow: 2px 2px 0px #fff;
-    pointer-events: none; z-index: 200;
-    animation: floatUp 0.8s ease-out forwards;
-  }
-  @keyframes floatUp {
-    0% { opacity: 1; transform: translateY(0); }
-    100% { opacity: 0; transform: translateY(-100px); }
-  }
-  
-  .golden-ice {
-    position: absolute; font-size: 50px;
-    cursor: pointer; z-index: 100;
-    animation: goldenSpin 1.5s linear infinite;
-  }
-  @keyframes goldenSpin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-  
-  .container {
-    margin: 15px auto 0 auto;
-    max-width: 320px;
-  }
-  .panel {
-    background: white; padding: 15px;
-    border-radius: 16px; margin-bottom: 20px;
-  }
-  .panel h3 { color: #ff69b4; margin-top: 0; }
-  
-  .shop-item, .achievement-item {
-    background: #f9f9f9; border-radius: 8px;
-    padding: 12px; margin: 10px 0;
-    text-align: center;
-  }
-  .item-name {
-    font-weight: bold; font-size: 16px;
-  }
-  .item-details {
-    font-size: 13px; color: #666; margin: 5px 0;
-  }
-  
-  .achievement-item {
-    opacity: 0.4; background: #eaeaea;
-  }
-  .achievement-item.unlocked {
-    opacity: 1; border: 2px solid #00bcd4;
-    background: linear-gradient(
-      135deg, #e0f7fa, #b2ebf2
-    );
-  }
-  
-  button {
-    padding: 10px 20px; color: white;
-    border: none; background: #ff69b4;
-    border-radius: 20px; cursor: pointer;
-    font-weight: bold; width: 100%;
-    max-width: 180px;
-  }
-  button:disabled {
-    background: #ccc; cursor: not-allowed;
-  }
-  .system-btn {
-    background: #708090; font-size: 11px;
-    padding: 6px 12px; width: auto; margin: 3px;
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>アイスクリームクリッカー</title>
+    
+    <!-- CSS（デザイン）をここに合体 -->
+    <style>
+        body { 
+            background-color: #fff0f5; 
+            font-family: 'Helvetica Neue', Arial, sans-serif; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .game-container {
+            text-align: center;
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        #ice-button {
+            font-size: 80px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        #ice-button:active {
+            transform: scale(0.9); /* クリックしたときに弾む動き */
+        }
+        .shop {
+            margin-top: 30px;
+            border-top: 2px dashed #ffb6c1;
+            padding-top: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 10px;
+            border: 1px solid #ffb6c1;
+            background-color: #fff;
+            cursor: pointer;
+        }
+        button:disabled {
+            background-color: #ddd;
+            cursor: not-allowed;
+        }
+    </style>
 </head>
 <body>
 
-  <h1>無限アイスクリッカー</h1>
-  
-  <div class="status-box">
-    <div>所持: <span id="coin-count"
-      class="coin-highlight">0</span></div>
-    <div style="font-size: 13px; margin-top: 4px;">
-      毎秒: <span id="cps-count">0</span> |
-      クリック: <span id="power-count">1</span>
+    <div class="game-container">
+        <h1>アイスクリッカー</h1>
+        <p>スコア: <span id="score">0</span> コーン</p>
+        
+        <!-- クリックするメインのアイス -->
+        <button id="ice-button">🍦</button>
+        
+        <div class="shop">
+            <h2>ショップ</h2>
+            <button id="buy-auto-clicker" disabled>自動クリック機 (コスト: 10)</button>
+        </div>
     </div>
-    <div style="font-size: 11px; color: #666;"
-      id="prestige-info">
-      転生: 0回 (ボーナス: +0%)
-    </div>
-  </div>
 
-  <div id="ice-cream">🍦</div>
-  
-  <div>
-    <button class="system-btn"
-      onclick="saveGame()">💾 セーブ</button>
-    <button class="system-btn"
-      style="background:#cd5c5c"
-      onclick="resetGame()">🗑️ 初期化</button>
-    <button class="system-btn"
-      style="background:#daa520; display:block;
-      margin:8px auto; width:200px;"
-      id="prestige-btn"
-      onclick="prestigeGame()">
-      ✨ 転生 (必要: 100k)
-    </button>
-  </div>
-  
-  <div class="container">
-    <div class="panel">
-      <h3>🛒 ショップ</h3>
-      
-      <div class="shop-item">
-        <div class="item-name">🍫 チョコ</div>
-        <div class="item-details">
-          価格: <span id="item1-cost">15</span><br>
-          (クリック力 +1)
-        </div>
-        <button id="buy-item1"
-          onclick="buyItem1()">購入</button>
-      </div>
-      
-      <div class="shop-item">
-        <div class="item-name">🤖 自動製造機</div>
-        <div class="item-details">
-          価格: <span id="item2-cost">100</span><br>
-          (毎秒自動 +1)
-        </div>
-        <button id="buy-item2"
-          onclick="buyItem2()">購入</button>
-      </div>
-      
-      <div class="shop-item">
-        <div class="item-name">🏪 専門店</div>
-        <div class="item-details">
-          価格: <span id="item3-cost">1.1k</span><br>
-          (毎秒自動 +15)
-        </div>
-        <button id="buy-item3"
-          onclick="buyItem3()">購入</button>
-      </div>
-      
-      <div class="shop-item">
-        <div class="item-name">🚀 宇宙工場</div>
-        <div class="item-details">
-          価格: <span id="item4-cost">12k</span><br>
-          (毎秒自動 +250)
-        </div>
-        <button id="buy-item4"
-          onclick="buyItem4()">購入</button>
-      </div>
-    </div>
-    
-    <div class="panel">
-      <h3>🏆 実績 (倍率UP)</h3>
-      <div id="ach1" class="achievement-item">
-        <div class="item-name">🔰 新米</div>
-        <div class="item-details">100枚達成</div>
-        <span id="ach1-status">未達成</span>
-      </div>
-      <div id="ach2" class="achievement-item">
-        <div class="item-name">🏭 工場長</div>
-        <div class="item-details">自動機5台</div>
-        <span id="ach2-status">未達成</span>
-      </div>
-      <div id="ach3" class="achievement-item">
-        <div class="item-name">💰 富豪</div>
-        <div class="item-details">10k枚達成</div>
-        <span id="ach3-status">未達成</span>
-      </div>
-      <div id="ach4" class="achievement-item">
-        <div class="item-name">🏢 大企業</div>
-        <div class="item-details">専門店5軒</div>
-        <span id="ach4-status">未達成</span>
-      </div>
-      <div id="ach5" class="achievement-item">
-        <div class="item-name">🌌 覇者</div>
-        <div class="item-details">宇宙5基</div>
-        <span id="ach5-status">未達成</span>
-      </div>
-    </div>
-  </div>
+    <!-- JavaScript（動きの仕組み)をここに合体 -->
+    <script>
+        let score = 0;
+        let autoClickers = 0;
+        let autoClickerCost = 10;
 
+        const scoreDisplay = document.getElementById('score');
+        const iceButton = document.getElementById('ice-button');
+        const buyAutoClickerButton = document.getElementById('buy-auto-clicker');
+
+        // 画面更新
+        function updateDisplay() {
+            scoreDisplay.textContent = score;
+            buyAutoClickerButton.disabled = score < autoClickerCost;
+        }
+
+        // アイスクリック時
+        iceButton.addEventListener('click', () => {
+            score++;
+            updateDisplay();
+        });
+
+        // 自動クリック機購入時
+        buyAutoClickerButton.addEventListener('click', () => {
+            if (score >= autoClickerCost) {
+                score -= autoClickerCost;
+                autoClickers++;
+                autoClickerCost = Math.floor(autoClickerCost * 1.5); // コストを1.5倍に
+                buyAutoClickerButton.textContent = `自動クリック機 (コスト: ${autoClickerCost})`;
+                updateDisplay();
+            }
+        });
+
+        // 1秒ごとの自動増加タイマー
+        setInterval(() => {
+            if (autoClickers > 0) {
+                score += autoClickers;
+                updateDisplay();
+            }
+        }, 1000);
+    </script>
 </body>
 </html>
-let gameData = {
-  coins: 0, baseClickPower: 1, cps: 0,
-  prestigeCount: 0,
-  item1Cost: 15, item2Cost: 100, item2Count: 0,
-  item3Cost: 1100, item3Count: 0,
-  item4Cost: 12000, item4Count: 0,
-  ach1Unlocked: false, ach2Unlocked: false,
-  ach3Unlocked: false, ach4Unlocked: false,
-  ach5Unlocked: false
-};
-
-function formatNumber(num) {
-  if (num >= 1000000) {
-    return (num / 1000000).toFixed(1) + 'M';
-  }
-  if (num >= 1000) {
-    return (num / 1000).toFixed(1) + 'k';
-  }
-  return Math.floor(num).toString();
-}
-
-function getMultiplier() {
-  let mult = 1 + (gameData.prestigeCount * 0.5);
-  if (gameData.ach1Unlocked) mult *= 1.2;
-  if (gameData.ach2Unlocked) mult *= 1.2;
-  if (gameData.ach3Unlocked) mult *= 1.2;
-  if (gameData.ach4Unlocked) mult *= 1.2;
-  if (gameData.ach5Unlocked) mult *= 1.2;
-  return mult;
-}
-
-function getClickPower() {
-  return Math.ceil(
-    gameData.baseClickPower * getMultiplier()
-  );
-}
-function getCps() {
-  return Math.ceil(
-    gameData.cps * getMultiplier()
-  );
-}
-
-function updateDisplay() {
-  document.getElementById('coin-count')
-    .innerText = formatNumber(gameData.coins);
-  document.getElementById('cps-count')
-    .innerText = formatNumber(getCps());
-  document.getElementById('power-count')
-    .innerText = formatNumber(getClickPower());
-  document.getElementById('item1-cost')
-    .innerText = formatNumber(gameData.item1Cost);
-  document.getElementById('item2-cost')
-    .innerText = formatNumber(gameData.item2Cost);
-  document.getElementById('item3-cost')
-    .innerText = formatNumber(gameData.item3Cost);
-  document.getElementById('item4-cost')
-    .innerText = formatNumber(gameData.item4Cost);
-  
-  document.getElementById('buy-item1').disabled =
-    gameData.coins < gameData.item1Cost;
-  document.getElementById('buy-item2').disabled =
-    gameData.coins < gameData.item2Cost;
-  document.getElementById('buy-item3').disabled =
-    gameData.coins < gameData.item3Cost;
-  document.getElementById('buy-item4').disabled =
-    gameData.coins < gameData.item4Cost;
-  
-  document.getElementById('prestige-info')
-    .innerText = `転生: ${gameData.prestigeCount}回`
-    + ` (ボーナス: +${gameData.prestigeCount * 50}%)`;
-  document.getElementById('prestige-btn').disabled =
-    gameData.coins < 100000;
-
-  if (gameData.ach1Unlocked) {
-    document.getElementById('ach1')
-      .classList.add('unlocked');
-    document.getElementById('ach1-status')
-      .innerText = '🎉';
-  }
-  if (gameData.ach2Unlocked) {
-    document.getElementById('ach2')
-      .classList.add('unlocked');
-    document.getElementById('ach2-status')
-      .innerText = '🎉';
-  }
-  if (gameData.ach3Unlocked) {
-    document.getElementById('ach3')
-      .classList.add('unlocked');
-    document.getElementById('ach3-status')
-      .innerText = '🎉';
-  }
-  if (gameData.ach4Unlocked) {
-    document.getElementById('ach4')
-      .classList.add('unlocked');
-    document.getElementById('ach4-status')
-      .innerText = '🎉';
-  }
-  if (gameData.ach5Unlocked) {
-    document.getElementById('ach5')
-      .classList.add('unlocked');
-    document.getElementById('ach5-status')
-      .innerText = '🎉';
-  }
-}
-
-function createPopEffect(x, y, text) {
-  const pop = document.createElement('div');
-  pop.className = 'click-pop'; pop.innerText = text;
-  pop.style.left = `${x}px`; pop.style.top = `${y}px`;
-  document.body.appendChild(pop);
-  setTimeout(() => pop.remove(), 800);
-}
-
-// 【重要】画面が読み込まれたら自動でアイスと連動させる仕組み
-window.onload = function() {
-  document.getElementById('ice-cream')
-    .addEventListener('click', (e) => {
-      const p = getClickPower(); gameData.coins += p;
-      createPopEffect(
-        e.pageX, e.pageY, `+${formatNumber(p)}`
-      );
-      checkAchievements(); updateDisplay();
-  });
-  loadGame(); updateDisplay();
-};
-
-function buyItem1() {
-  if (gameData.coins >= gameData.item1Cost) {
-    gameData.coins -= gameData.item1Cost;
-    gameData.baseClickPower += 1;
-    gameData.item1Cost = Math.ceil(
-      gameData.item1Cost * 1.15
-    );
-    updateDisplay();
-  }
-}
-function buyItem2() {
-  if (gameData.coins >= gameData.item2Cost) {
-    gameData.coins -= gameData.item2Cost;
-    gameData.cps += 1; gameData.item2Count += 1;
-    gameData.item2Cost = Math.ceil(
-      gameData.item2Cost * 1.15
-    );
-    checkAchievements(); updateDisplay();
-  }
-}
-function buyItem3() {
-  if (gameData.coins >= gameData.item3Cost) {
-    gameData.coins -= gameData.item3Cost;
-    gameData.cps += 15; gameData.item3Count += 1;
-    gameData.item3Cost = Math.ceil(
-      gameData.item3Cost * 1.15
-    );
-    checkAchievements(); updateDisplay();
-  }
-}
-function buyItem4() {
-  if (gameData.coins >= gameData.item4Cost) {
-    gameData.coins -= gameData.item4Cost;
-    gameData.cps += 250; gameData.item4Count += 1;
-    gameData.item4Cost = Math.ceil(
-      gameData.item4Cost * 1.15
-    );
-    checkAchievements(); updateDisplay();
-  }
-}
-
-function checkAchievements() {
-  if (!gameData.ach1Unlocked &&
-      gameData.coins >= 100) {
-    gameData.ach1Unlocked = true;
-  }
-  if (!gameData.ach2Unlocked &&
-      gameData.item2Count >= 5) {
-    gameData.ach2Unlocked = true;
-  }
-  if (!gameData.ach3Unlocked &&
-      gameData.coins >= 10000) {
-    gameData.ach3Unlocked = true;
-  }
-  if (!gameData.ach4Unlocked &&
-      gameData.item3Count >= 5) {
-    gameData.ach4Unlocked = true;
-  }
-  if (!gameData.ach5Unlocked &&
-      gameData.item4Count >= 5) {
-    gameData.ach5Unlocked = true;
-  }
-}
-
-function prestigeGame() {
-  if (gameData.coins >= 100000) {
-    if (confirm('転生しますか？')) {
-      gameData.prestigeCount += 1;
-      gameData.coins = 0;
-      gameData.baseClickPower = 1;
-      gameData.cps = 0;
-      gameData.item1Cost = 15;
-      gameData.item2Cost = 100;
-      gameData.item2Count = 0;
-      gameData.item3Cost = 1100;
-      gameData.item3Count = 0;
-      gameData.item4Cost = 12000;
-      gameData.item4Count = 0;
-      gameData.ach1Unlocked = false;
-      gameData.ach2Unlocked = false;
-      gameData.ach3Unlocked = false;
-      gameData.ach4Unlocked = false;
-      gameData.ach5Unlocked = false;
-      saveGame(); updateDisplay();
-    }
-  }
-}
-
-function spawnGoldenIce() {
-  const g = document.createElement('div');
-  g.className = 'golden-ice'; g.innerText = '✨🍦✨';
-  g.style.left = Math.random() *
-    (window.innerWidth - 80) + 'px';
-  g.style.top = Math.random() *
-    (window.innerHeight - 80) + 'px';
-  g.addEventListener('click', (e) => {
-    const b = Math.max(
-      50, Math.floor(gameData.coins * 0.15)
-    );
-    gameData.coins += b;
-    createPopEffect(
-      e.pageX, e.pageY, `👑 +${formatNumber(b)}`
-    );
-    g.remove(); updateDisplay();
-  });
-  document.body.appendChild(g);
-  setTimeout(() => {
-    if(g) g.remove();
-  }, 8000);
-}
-
-setInterval(() => {
-  if (Math.random() > 0.4) spawnGoldenIce();
-}, 12000);
-
-setInterval(() => {
-  if (getCps() > 0) {
-    gameData.coins += (getCps() / 10);
-    checkAchievements(); updateDisplay();
-  }
-}, 100);
-
-setInterval(saveGame, 10000);
-
-function saveGame() {
-  localStorage.setItem(
-    'iceClickerSplitOnloadFix',
-    JSON.stringify(gameData)
-  );
-}
-function loadGame() {
-  const s = localStorage.getItem(
-    'iceClickerSplitOnloadFix'
-  );
-  if (s) {
-    gameData = JSON.parse(s);
-  }
-}
-function resetGame() {
-  if (confirm('リセットしますか？')) {
-    localStorage.removeItem(
-      'iceClickerSplitOnloadFix'
-    );
-    location.reload();
-  }
-}

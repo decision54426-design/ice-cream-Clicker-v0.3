@@ -5,8 +5,10 @@
 <meta name="viewport"
  content="width=device-width, initial-scale=1.0">
 <title>無限アイスクリッカー</title>
-<!-- 【重要】ここでdeferを付けてJSを安全に読み込みます -->
-<script src="script.js" defer></script>
+
+<!-- 【修正】同じフォルダ内のjsを確実に読み込む設定 -->
+<script src="./script.js"></script>
+
 <style>
   body {
     font-family: sans-serif;
@@ -130,7 +132,6 @@
     </div>
   </div>
 
-  <!-- ここがメインの動くアイス（🍦）です -->
   <div id="ice-cream">🍦</div>
   
   <div>
@@ -338,8 +339,8 @@ function createPopEffect(x, y, text) {
   setTimeout(() => pop.remove(), 800);
 }
 
-// 【ここを修正】画面がすべて準備できてからクリックを受け付けるようにしました
-window.addEventListener('DOMContentLoaded', () => {
+// 【重要】画面が読み込まれたら自動でアイスと連動させる仕組み
+window.onload = function() {
   document.getElementById('ice-cream')
     .addEventListener('click', (e) => {
       const p = getClickPower(); gameData.coins += p;
@@ -349,7 +350,7 @@ window.addEventListener('DOMContentLoaded', () => {
       checkAchievements(); updateDisplay();
   });
   loadGame(); updateDisplay();
-});
+};
 
 function buyItem1() {
   if (gameData.coins >= gameData.item1Cost) {
@@ -477,13 +478,13 @@ setInterval(saveGame, 10000);
 
 function saveGame() {
   localStorage.setItem(
-    'iceClickerSplitPerfectFix4',
+    'iceClickerSplitOnloadFix',
     JSON.stringify(gameData)
   );
 }
 function loadGame() {
   const s = localStorage.getItem(
-    'iceClickerSplitPerfectFix4'
+    'iceClickerSplitOnloadFix'
   );
   if (s) {
     gameData = JSON.parse(s);
@@ -492,7 +493,7 @@ function loadGame() {
 function resetGame() {
   if (confirm('リセットしますか？')) {
     localStorage.removeItem(
-      'iceClickerSplitPerfectFix4'
+      'iceClickerSplitOnloadFix'
     );
     location.reload();
   }

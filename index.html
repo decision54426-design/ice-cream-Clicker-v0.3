@@ -5,6 +5,8 @@
 <meta name="viewport"
  content="width=device-width, initial-scale=1.0">
 <title>無限アイスクリッカー</title>
+<!-- 【重要】ここでdeferを付けてJSを安全に読み込みます -->
+<script src="script.js" defer></script>
 <style>
   body {
     font-family: sans-serif;
@@ -128,7 +130,7 @@
     </div>
   </div>
 
-  <!-- ここがメインの動くアイスになります -->
+  <!-- ここがメインの動くアイス（🍦）です -->
   <div id="ice-cream">🍦</div>
   
   <div>
@@ -221,8 +223,6 @@
     </div>
   </div>
 
-  <!-- ここで下の仕組み（script.js）を呼び出します -->
-  <script src="script.js"></script>
 </body>
 </html>
 let gameData = {
@@ -338,13 +338,17 @@ function createPopEffect(x, y, text) {
   setTimeout(() => pop.remove(), 800);
 }
 
-document.getElementById('ice-cream')
-  .addEventListener('click', (e) => {
-    const p = getClickPower(); gameData.coins += p;
-    createPopEffect(
-      e.pageX, e.pageY, `+${formatNumber(p)}`
-    );
-    checkAchievements(); updateDisplay();
+// 【ここを修正】画面がすべて準備できてからクリックを受け付けるようにしました
+window.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('ice-cream')
+    .addEventListener('click', (e) => {
+      const p = getClickPower(); gameData.coins += p;
+      createPopEffect(
+        e.pageX, e.pageY, `+${formatNumber(p)}`
+      );
+      checkAchievements(); updateDisplay();
+  });
+  loadGame(); updateDisplay();
 });
 
 function buyItem1() {
@@ -473,25 +477,23 @@ setInterval(saveGame, 10000);
 
 function saveGame() {
   localStorage.setItem(
-    'iceClickerSplitPerfect',
+    'iceClickerSplitPerfectFix4',
     JSON.stringify(gameData)
   );
 }
 function loadGame() {
   const s = localStorage.getItem(
-    'iceClickerSplitPerfect'
+    'iceClickerSplitPerfectFix4'
   );
   if (s) {
     gameData = JSON.parse(s);
-    updateDisplay();
   }
 }
 function resetGame() {
   if (confirm('リセットしますか？')) {
     localStorage.removeItem(
-      'iceClickerSplitPerfect'
+      'iceClickerSplitPerfectFix4'
     );
     location.reload();
   }
 }
-loadGame(); updateDisplay();
